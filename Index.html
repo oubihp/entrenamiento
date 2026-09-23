@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bitácora de Entrenamiento</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0e0d0b;
+    --paper: #171512;
+    --paper-raised: #1e1c18;
+    --paper-raised-2: #262319;
+    --moss: #7fae82;
+    --moss-dim: #2a3a2b;
+    --clay: #d38a63;
+    --clay-dim: #3a2a20;
+    --slate: #8fa8c2;
+    --slate-dim: #26323f;
+    --ochre: #d4ac5c;
+    --ochre-dim: #3a3220;
+    --line: #35322b;
+    --line-soft: #26241f;
+    --muted: #a39a89;
+    --text: #ece7dd;
+    --danger: #d97567;
+    --danger-dim: #3a2420;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body { background: var(--paper); color: var(--text); font-family: 'Space Grotesk', sans-serif; -webkit-font-smoothing: antialiased; }
+  .mono { font-family: 'JetBrains Mono', monospace; }
+
+  /* ── HEADER ── */
+  .masthead { background: var(--ink); color: var(--text); padding: 2.2rem 1.5rem 1.5rem; position: relative; overflow: hidden; border-bottom: 1px solid var(--line); }
+  .masthead::after { content: ""; position: absolute; top: -40%; right: -10%; width: 280px; height: 280px; border-radius: 50%; background: radial-gradient(circle, rgba(211,138,99,0.14) 0%, transparent 70%); }
+  .eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.6rem; }
+  .masthead h1 { font-family: 'Fraunces', serif; font-weight: 600; font-size: 1.9rem; line-height: 1.05; letter-spacing: -0.01em; margin-bottom: 0.4rem; color: #f5f1e8; }
+  .masthead .subtitle { font-size: 0.82rem; color: var(--muted); max-width: 34ch; line-height: 1.5; }
+
+  /* Weekly ring summary in header */
+  .week-summary { display: flex; gap: 0.5rem; margin-top: 1rem; }
+  .week-summary-day {
+    flex: 1; height: 5px; border-radius: 3px; background: #2a2822;
+  }
+  .week-summary-day.complete { background: var(--moss); }
+  .week-summary-day.partial { background: var(--ochre); }
+
+  /* ── NAV ── */
+  .nav { position: sticky; top: 0; z-index: 50; background: var(--paper); border-bottom: 1px solid var(--line); display: flex; padding: 0 1rem; overflow-x: auto; }
+  .nav-btn { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; letter-spacing: 0.04em; padding: 0.9rem 0.9rem; background: none; border: none; color: var(--muted); cursor: pointer; white-space: nowrap; border-bottom: 2px solid transparent; transition: color 0.15s, border-color 0.15s; }
+  .nav-btn.active { color: var(--text); border-bottom-color: var(--clay); font-weight: 500; }
+
+  .view { display: none; padding: 1.5rem 1.25rem 3rem; max-width: 760px; margin: 0 auto; }
+  .view.active { display: block; }
+
+  .section-label { font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.4rem; }
+  .section-title { font-family: 'Fraunces', serif; font-size: 1.4rem; font-weight: 600; margin-bottom: 0.9rem; letter-spacing: -0.01em; color: #f5f1e8; }
+
+  /* ── DAY TABS ── */
+  .day-tabs { display: flex; gap: 0.4rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+  .day-tab { padding: 0.5rem 0.85rem; background: var(--paper-raised); border: 1.5px solid var(--line); border-radius: 20px; cursor: pointer; font-size: 0.75rem; font-weight: 500; transition: all 0.15s; color: var(--text); position: relative; }
+  .day-tab .dt-check { font-size: 0.7rem; margin-left: 4px; }
+
+  /* ── INFO CARD ── */
+  .info-card { background: var(--paper-raised); border: 1.5px solid var(--line); border-radius: 10px; padding: 0.9rem 1rem; margin-bottom: 0.7rem; }
+  .info-card-title { font-size: 0.85rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--text); }
+  .info-card-body { font-size: 0.8rem; color: var(--muted); line-height: 1.6; }
+
+  /* ── ADVICE CARDS ── */
+  .advice-card { background: var(--paper-raised); border: 1.5px solid var(--line); border-radius: 10px; margin-bottom: 0.55rem; overflow: hidden; }
+  .advice-head { width: 100%; display: flex; align-items: center; gap: 0.7rem; padding: 0.8rem 0.95rem; background: none; border: none; cursor: pointer; text-align: left; color: var(--text); }
+  .advice-icon { font-size: 1.15rem; flex-shrink: 0; }
+  .advice-title { flex: 1; font-size: 0.83rem; font-weight: 600; }
+  .advice-body { display: none; padding: 0 0.95rem 0.85rem; font-size: 0.8rem; color: var(--muted); line-height: 1.6; border-top: 1px solid var(--line-soft); padding-top: 0.7rem; }
+  .advice-card.open .advice-body { display: block; }
+  .advice-card.open .advice-chevron { transform: rotate(180deg); }
+  .chevron { font-size: 1rem; color: var(--muted); transition: transform 0.2s; flex-shrink: 0; }
+
+  /* ── HR CARD ── */
+  .hr-card { background: var(--paper-raised-2); border: 1px solid var(--line); color: var(--text); border-radius: 12px; padding: 1.25rem; margin-bottom: 1.25rem; }
+  .hr-card .hr-label { font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.5rem; }
+  .hr-range { font-family: 'Fraunces', serif; font-size: 2.2rem; font-weight: 600; margin-bottom: 0.2rem; color: #f5f1e8; }
+  .hr-range span { color: var(--clay); }
+  .hr-note { font-size: 0.78rem; color: var(--muted); line-height: 1.6; }
+
+  /* ── EXCLUDED ── */
+  .excl-toggle { width: 100%; padding: 0.75rem 0.9rem; background: var(--danger-dim); border: 1.5px solid #5c2f28; border-radius: 10px; cursor: pointer; text-align: left; font-size: 0.78rem; font-weight: 600; color: var(--danger); margin-top: 1rem; }
+  .excl-list { display: none; margin-top: 0.55rem; flex-direction: column; gap: 0.5rem; }
+  .excl-list.open { display: flex; }
+  .excl-item { padding: 0.7rem 0.85rem; background: var(--paper-raised); border: 1px solid #5c2f28; border-radius: 8px; }
+  .excl-item .e-name { font-size: 0.78rem; font-weight: 600; margin-bottom: 0.15rem; color: var(--text); }
+  .excl-item .e-reason { font-size: 0.75rem; color: var(--muted); line-height: 1.5; }
+
+  /* ═══ SHARED: always-visible video exercise card (used by Fit Gent AND Mobility) ═══ */
+  .prog-bar { display: flex; gap: 4px; margin-bottom: 1rem; }
+  .prog-seg { flex: 1; height: 3px; border-radius: 2px; background: var(--line); transition: background 0.2s; }
+  .prog-seg.done { background: var(--clay); }
+
+  .day-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+  .day-header-title { font-family: 'Fraunces', serif; font-size: 1.15rem; font-weight: 600; color: #f5f1e8; }
+  .day-header-count { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--muted); }
+
+  .ex-card2 { background: var(--paper-raised); border: 1.5px solid var(--line); border-radius: 12px; margin-bottom: 1rem; overflow: hidden; transition: border-color 0.2s; }
+  .ex-card2.completed { border-color: var(--moss); }
+  .ex-card2-head { display: flex; align-items: center; gap: 0.7rem; padding: 0.85rem 1rem; border-bottom: 1px solid var(--line-soft); }
+  .ex-num2 { width: 24px; height: 24px; border-radius: 7px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; font-weight: 700; }
+  .ex-name2 { flex: 1; font-size: 0.88rem; font-weight: 600; color: var(--text); }
+  .ex-sets2 { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: var(--muted); flex-shrink: 0; }
+  .ex-check-btn {
+    width: 26px; height: 26px; border-radius: 7px; border: 1.5px solid var(--line);
+    background: var(--paper-raised-2); cursor: pointer; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    color: transparent; font-size: 0.8rem; font-weight: 700;
+    transition: all 0.15s;
+  }
+  .ex-check-btn.checked { background: var(--moss); border-color: var(--moss); color: var(--ink); }
+
+  .video-wrap2 { position: relative; width: 100%; aspect-ratio: 16/9; background: #000; }
+  .video-wrap2 iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+
+  .ex-tips2 { padding: 0.8rem 1rem 0.2rem; }
+  .tip-row2 { display: flex; gap: 0.55rem; align-items: flex-start; margin-bottom: 0.32rem; }
+  .tip-dot2 { width: 4px; height: 4px; border-radius: 50%; flex-shrink: 0; margin-top: 0.42rem; }
+  .tip-text2 { font-size: 0.79rem; color: var(--text); opacity: 0.85; line-height: 1.5; }
+
+  .why-box2 { margin: 0 1rem 0.8rem; padding: 0.6rem 0.8rem; border-radius: 7px; border-left: 3px solid; font-size: 0.78rem; line-height: 1.55; }
+  .why-label2 { font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; margin-bottom: 0.25rem; display: block; }
+  .caution-box2 { margin: 0 1rem 0.8rem; padding: 0.55rem 0.7rem; background: var(--ochre-dim); border-left: 3px solid var(--ochre); border-radius: 0 5px 5px 0; font-size: 0.73rem; color: #e8cf9a; line-height: 1.5; }
+
+  /* Set tracker rows */
+  .set-tracker { display: flex; gap: 0.4rem; padding: 0 1rem 1rem; flex-wrap: wrap; }
+  .set-pill {
+    flex: 1; min-width: 44px; padding: 0.45rem 0.3rem; border-radius: 7px;
+    background: var(--paper-raised-2); border: 1.5px solid var(--line);
+    text-align: center; cursor: pointer; transition: all 0.15s;
+  }
+  .set-pill.done { background: var(--moss-dim); border-color: var(--moss); }
+  .set-pill .sp-label { font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; color: var(--muted); display: block; }
+  .set-pill.done .sp-label { color: var(--moss); }
+  .set-pill .sp-mark { font-size: 0.85rem; color: var(--muted); }
+  .set-pill.done .sp-mark { color: var(--moss); }
+
+  .day-nav-buttons { display: flex; gap: 0.5rem; margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid var(--line); }
+  .day-nav-btn { flex: 1; padding: 0.7rem; background: var(--paper-raised); border: 1.5px solid var(--line); border-radius: 8px; color: var(--text); font-size: 0.78rem; font-weight: 600; cursor: pointer; font-family: 'Space Grotesk', sans-serif; text-align: center; }
+  .day-nav-btn:disabled { opacity: 0.3; cursor: default; }
+  .day-nav-btn.primary { background: var(--clay); border-color: var(--clay); color: var(--ink); }
+
+  .day-complete-banner {
+    display: flex; align-items: center; gap: 0.6rem;
+    padding: 0.8rem 1rem; background: var(--moss-dim); border: 1.5px solid var(--moss);
+    border-radius: 10px; margin-bottom: 1rem; font-size: 0.82rem; font-weight: 600; color: var(--moss);
+  }
+
+  .reset-btn {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: var(--muted);
+    background: none; border: 1px solid var(--line); border-radius: 6px; padding: 0.3rem 0.6rem;
+    cursor: pointer; margin-top: 1.5rem;
+  }
+  .reset-btn:hover { color: var(--danger); border-color: var(--danger); }
+
+  /* ── NOTES / CONDITIONS SECTION ── */
+  .note-card { background: var(--paper-raised); border: 1.5px solid var(--line); border-left: 3px solid var(--clay); border-radius: 10px; padding: 1rem 1.1rem; margin-bottom: 0.9rem; }
+  .note-card-title { font-size: 0.9rem; font-weight: 600; margin-bottom: 0.4rem; color: #f5f1e8; }
+  .note-card-body { font-size: 0.82rem; color: var(--muted); line-height: 1.65; }
+  .condition-tags { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.9rem; }
+  .condition-chip { font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; padding: 0.32rem 0.65rem; border: 1px solid var(--line); border-radius: 3px; color: var(--muted); letter-spacing: 0.02em; }
+
+  @media (max-width: 480px) { .masthead h1 { font-size: 1.55rem; } }
+</style>
+</head>
+<body>
+
+<div class="masthead">
+  <div class="eyebrow">Bitácora personal de entrenamiento</div>
+  <h1>Fuerza, movilidad<br>y postura</h1>
+  <div class="subtitle">Programa completo con seguimiento de progreso.</div>
+  <div class="week-summary" id="week-summary"></div>
+</div>
+
+<div class="nav">
+  <button class="nav-btn active" data-view="stretch">Movilidad · 10 min</button>
+  <button class="nav-btn" data-view="fullbody">Full Body · Fit Gent</button>
+  <button class="nav-btn" data-view="cardio">Cardio &amp; HR</button>
+  <button class="nav-btn" data-view="advice">Consejos</button>
+  <button class="nav-btn" data-view="notes">Notas</button>
+</div>
+
+<!-- ══════════════ MOVILIDAD (10 MIN, VIDEO EMBEBIDO, CHECKS) ══════════════ -->
+<div class="view active" id="view-stretch">
+  <div class="section-label">Rutina diaria · Primero del día</div>
+  <div class="section-title">Movilidad y postura — 10 min</div>
+
+  <div id="stretch-complete-banner"></div>
+  <div class="prog-bar" id="stretch-progress"></div>
+  <div class="day-header">
+    <div class="day-header-title">5 ejercicios de hoy</div>
+    <div class="day-header-count" id="stretch-count"></div>
+  </div>
+
+  <div id="stretch-exercises"></div>
+
+  <button class="reset-btn" onclick="resetDay('stretch')">Reiniciar checks de hoy</button>
+</div>
+
+<!-- ══════════════ FULL BODY FIT GENT ══════════════ -->
+<div class="view" id="view-fullbody">
+  <div class="section-label">Rutina principal · Loop Bands</div>
+  <div class="section-title">Full Body — 4 días (Fit Gent)</div>
+
+  <div class="day-tabs" id="fullbody-day-tabs"></div>
+
+  <div id="fb-complete-banner"></div>
+  <div class="prog-bar" id="fb-progress"></div>
+  <div class="day-header">
+    <div class="day-header-title" id="fb-day-title"></div>
+    <div class="day-header-count" id="fb-day-count"></div>
+  </div>
+
+  <div id="fullbody-exercises"></div>
+
+  <button class="reset-btn" onclick="resetDay('fb-' + fullbodyActiveDay)">Reiniciar checks de este día</button>
+
+  <button class="excl-toggle" onclick="toggleExcluded()">⛔ Ver ejercicios del video excluidos y por qué</button>
+  <div class="excl-list" id="excl-list"></div>
+</div>
+
+<!-- ══════════════ CARDIO ══════════════ -->
+<div class="view" id="view-cardio">
+  <div class="section-label">Complemento aeróbico</div>
+  <div class="section-title">Caminata &amp; frecuencia cardiaca</div>
+
+  <div class="hr-card">
+    <div class="hr-label">Rango objetivo</div>
+    <div class="hr-range">108 <span>–</span> 127 <span style="font-size:1rem; color:var(--muted);">bpm</span></div>
+    <div class="hr-note">3–4 km por sesión, en los días que no hagas fuerza o como cierre de sesión.</div>
+  </div>
+
+  <div class="info-card" style="border-left: 3px solid var(--slate);">
+    <div class="info-card-title">La ciencia detrás del número — con matiz importante</div>
+    <div class="info-card-body">
+      Esta zona corresponde a la llamada "zona de quema de grasa" (60–70% de FC máxima estimada). El nombre es engañoso: a esta intensidad, un <em>porcentaje</em> mayor de las calorías provienen de grasa, pero el <em>total</em> de calorías gastadas por minuto es menor que a mayor intensidad.<br><br>
+      Lo que determina la pérdida de grasa real es el déficit calórico semanal total — no la zona específica de FC durante el cardio. Aun así, esta intensidad tiene sentido en tu caso: bajo impacto y sostenible para caminar casi todos los días sin interferir en la recuperación de tus días de fuerza.
+    </div>
+  </div>
+
+  <div class="info-card" style="border-left: 3px solid var(--moss);">
+    <div class="info-card-title">Cómo aplicarlo en la práctica</div>
+    <div class="info-card-body">No te obsesiones con el número exacto. Camina a un ritmo que te permita hablar pero con cierto esfuerzo. Si un día subes a 130-135, no arruina nada. Lo que importa es la consistencia semanal y el déficit calórico de tu plan.</div>
+  </div>
+</div>
+
+<!-- ══════════════ CONSEJOS ══════════════ -->
+<div class="view" id="view-advice">
+  <div class="section-label">Principios generales</div>
+  <div class="section-title">Consejos para todo el programa</div>
+  <div id="advice-cards"></div>
+</div>
+
+<!-- ══════════════ NOTAS (condiciones médicas) ══════════════ -->
+<div class="view" id="view-notes">
+  <div class="section-label">Referencia médica</div>
+  <div class="section-title">Notas de entrenamiento</div>
+
+  <div class="note-card">
+    <div class="note-card-title">Condiciones activas</div>
+    <div class="note-card-body">Toda la programación de este documento está diseñada alrededor de dos restricciones físicas actuales. Revísalas si algún día dudas por qué un ejercicio está incluido, modificado o excluido.</div>
+    <div class="condition-tags">
+      <span class="condition-chip">L5-S1 · Retrolistesis G1 (Meyerding)</span>
+      <span class="condition-chip">Desnivel pélvico</span>
+      <span class="condition-chip">Quiste sinovial muñeca derecha</span>
+    </div>
+  </div>
+
+  <div class="note-card">
+    <div class="note-card-title">Columna lumbar</div>
+    <div class="note-card-body">Disminución del espacio intersomático en el borde posterior de L5-S1, con retrolistesis de L5 grado I (Meyerding) y desnivel pélvico asociado. Sin síntomas neurológicos actuales (sin hormigueo, dolor irradiado a la pierna, ni pérdida de fuerza). Valorado por especialista.<br><br>
+    Esto significa evitar bisagra de cadera cargada, carga axial de compresión, hiperextensión lumbar y rotaciones de torso con resistencia — y priorizar ejercicios de control motor y estabilización (Bird Dog, plancha, puente de glúteo) por su respaldo en la literatura de rehabilitación lumbar.</div>
+  </div>
+
+  <div class="note-card">
+    <div class="note-card-title">Muñeca derecha</div>
+    <div class="note-card-body">Quiste sinovial activo, sin fecha estimada de resolución. Manejo actual: muñequera y antiinflamatorio.<br><br>
+    Esto significa evitar cualquier carga con la palma en extensión (push-ups, planchas en manos, press prono) y priorizar agarres neutros (martillo) en todo ejercicio de tracción o empuje. Si el quiste crece, se enrojece o duele más después de entrenar, reduce la carga general aunque el ejercicio no toque la muñeca directamente — la presión intraarticular sube con el esfuerzo global.</div>
+  </div>
+
+  <div class="note-card">
+    <div class="note-card-title">Objetivo del programa</div>
+    <div class="note-card-body">Fuerza general y reducción de grasa corporal, partiendo de una base de fitness casi nula. El déficit calórico total semanal es lo que determina la pérdida de grasa — el cardio en zona 108-127 bpm es complementario, no la variable principal.</div>
+  </div>
+</div>
+
+<script>
+// ═══════════════ STORAGE HELPERS ═══════════════
+// Progress persists locally on this device via localStorage. No account/sync involved.
+
+const STORE_KEY = 'training_progress_v1';
+
+function loadProgress() {
+  try {
+    const raw = localStorage.getItem(STORE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch (e) { return {}; }
+}
+function saveProgress(data) {
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(data)); } catch (e) {}
+}
+let progress = loadProgress();
+
+function todayKey() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+function getSetState(routineId, exIndex, setIndex) {
+  const key = `${routineId}:${todayKey()}`;
+  return !!(progress[key] && progress[key][exIndex] && progress[key][exIndex][setIndex]);
+}
+function toggleSetState(routineId, exIndex, setIndex) {
+  const key = `${routineId}:${todayKey()}`;
+  if (!progress[key]) progress[key] = {};
+  if (!progress[key][exIndex]) progress[key][exIndex] = {};
+  progress[key][exIndex][setIndex] = !progress[key][exIndex][setIndex];
+  saveProgress(progress);
+}
+function isExerciseComplete(routineId, exIndex, totalSets) {
+  const key = `${routineId}:${todayKey()}`;
+  if (!progress[key] || !progress[key][exIndex]) return false;
+  let count = 0;
+  for (let i = 0; i < totalSets; i++) if (progress[key][exIndex][i]) count++;
+  return count === totalSets;
+}
+function completedCount(routineId, exercisesWithSets) {
+  return exercisesWithSets.filter((totalSets, i) => isExerciseComplete(routineId, i, totalSets)).length;
+}
+function resetDay(routineId) {
+  if (!confirm('¿Reiniciar los checks de hoy para esta rutina?')) return;
+  const key = `${routineId}:${todayKey()}`;
+  delete progress[key];
+  saveProgress(progress);
+  if (routineId === 'stretch') renderStretch();
+  else renderFullbody();
+  renderWeekSummary();
+}
+
+// ═══════════════ DATA: MOVILIDAD (10 min, con video embebido) ═══════════════
+
+const stretchVideoId = null; // each has its own video id below
+
+const stretchExercises = [
+  { name: "Respiración + Cat-Cow (activación)", sets: 1, setLabel: ["8 reps"], duration: "2 min", color: "#8fa8c2", bg: "#26323f",
+    why: "Combina respiración diafragmática con movilidad segmentaria para activar el core y preparar la columna sin perder tiempo en dos bloques separados.",
+    how: ["3 respiraciones profundas boca arriba, sintiendo el abdomen subir y bajar", "Pasa a cuadrupedia: 8 repeticiones de Cat-Cow, ritmo lento", "Si sientes molestia en la extensión (Cow), reduce el rango"],
+    embedId: "xyNwxiuERXc", caution: null },
+  { name: "Estiramiento de flexores de cadera", sets: 2, setLabel: ["Lado izq.", "Lado der."], duration: "2 min · 30s/lado", color: "#d4ac5c", bg: "#3a3220",
+    why: "El psoas origina en L1-L4. Tenso, tira de la lumbar hacia adelante aumentando presión en el disco — el estiramiento de mayor retorno para tu caso.",
+    how: ["Rodilla en tierra, otra pierna al frente a 90°", "Mete el coxis (retroversión) ANTES de empujar la cadera adelante", "30s por lado, sin arquear la espalda"],
+    embedId: "HmfHMdmmVhc",
+    caution: "Meter el coxis antes de avanzar es el punto que más gente hace mal." },
+  { name: "Estiramiento 90/90 de cadera", sets: 2, setLabel: ["Lado izq.", "Lado der."], duration: "2 min · 30s/lado", color: "#d4ac5c", bg: "#3a3220",
+    why: "El desnivel pélvico genera asimetría de rotación de cadera. Aborda rotación interna y externa simultáneamente.",
+    how: ["Sentado, pierna delantera a 90° rotada afuera, trasera a 90° rotada adentro", "Espalda recta, inclínate suave hacia la pierna delantera", "Dedica 10s extra al lado más rígido"],
+    embedId: "icLzLOqfPf0", caution: null },
+  { name: "Bird Dog", sets: 2, setLabel: ["Lado izq.", "Lado der."], duration: "2 min · 6-8 reps/lado", color: "#7fae82", bg: "#2a3a2b",
+    why: "Activa multífido y transverso abdominal — estabilizadores profundos de L5-S1. El ejercicio con más respaldo científico de toda la rutina.",
+    how: ["Cuadrupedia, activa abdomen antes de mover", "Extiende brazo y pierna opuestos, muy despacio", "Caderas niveladas, 3s arriba, baja controlado"],
+    embedId: "MEKThiUpdyc", caution: null },
+  { name: "Plancha en codos", sets: 2, setLabel: ["Serie 1", "Serie 2"], duration: "2 min · 2×25-30s", color: "#7fae82", bg: "#2a3a2b",
+    why: "Cierra la rutina activando el core completo sin flexión lumbar. Puente directo hacia el entrenamiento de fuerza.",
+    how: ["Codos bajo hombros, línea recta cabeza-talones", "Aprieta ligeramente glúteos", "Respira normal — no aguantes la respiración"],
+    embedId: "X4k-fC-ubrI", caution: null },
+];
+
+// ═══ Fit Gent — con minuto exacto para embed ═══
+const VIDEO_ID = "Z1DrxG0nSOU";
+
+const fullbodyDays = [
+  { id: "fb1", label: "Día 1", title: "Glúteo + Pierna", color: "#7fae82", bg: "#2a3a2b",
+    exercises: [
+      { name: "Loop Band Squat", sets: 4, setLabel: null, setsLabelText: "4×12", t: 1155, tips: ["Torso vertical, liga sobre rodillas", "Baja hasta paralelo — no más por tu L5-S1"] },
+      { name: "Loop Band Glute Bridge", sets: 4, setsLabelText: "4×15", t: 1326, tips: ["Aprieta glúteo arriba sin hiperextender lumbar", "Empuja rodillas contra la liga al subir"] },
+      { name: "Loop Band Donkey Kicks", sets: 3, setsLabelText: "3×12/lado", t: 1195, tips: ["Cuadrupedia — activa el core antes de patear", "No arquees la espalda al extender la pierna"] },
+      { name: "Loop Band Lunge", sets: 3, setsLabelText: "3×10/lado", t: 1249, tips: ["Torso recto, rodilla trasera baja sin tocar suelo"] },
+      { name: "Loop Band Sumo Squat", sets: 3, setsLabelText: "3×12", t: 1282, tips: ["Pies más anchos que hombros, puntas afuera"] },
+      { name: "Loop Band Lateral Lunge", sets: 3, setsLabelText: "3×10/lado", t: 1454, tips: ["Cadera atrás, rodilla de apoyo sobre el tobillo"] },
+    ]
+  },
+  { id: "fb2", label: "Día 2", title: "Espalda + Hombro", color: "#8fa8c2", bg: "#26323f",
+    exercises: [
+      { name: "Loop Band Seated Reverse Grip Row", sets: 4, setsLabelText: "4×12", t: 491, tips: ["Agarre neutro/reverso — cero estrés en muñeca", "Tira con los codos, espalda recta"] },
+      { name: "Loop Band Seated Facepulls", sets: 3, setsLabelText: "3×15", t: 747, tips: ["Tira hacia la cara, codos altos", "Excelente para postura — aprieta omóplatos"] },
+      { name: "Loop Band Bent Over Row", sets: 4, setsLabelText: "4×12", t: 419, tips: ["Bisagra de cadera MUY leve — rodillas más dobladas para proteger L5-S1", "Si sientes tensión lumbar, cambia a la versión sentada"] },
+      { name: "Loop Band Standing Back Fly", sets: 3, setsLabelText: "3×12", t: 661, tips: ["Torso ligeramente inclinado, brazos casi rectos"] },
+      { name: "Loop Band Shoulder Press", sets: 3, setsLabelText: "3×10", t: 970, tips: ["Agarre neutro — pulgares hacia atrás", "No arquees la espalda al empujar arriba"] },
+      { name: "Loop Band Lateral Raise", sets: 3, setsLabelText: "3×12", t: 1002, tips: ["Codos con ligerísima flexión, sube hasta altura de hombro"] },
+    ]
+  },
+  { id: "fb3", label: "Día 3", title: "Abdomen + Glúteo", color: "#d4ac5c", bg: "#3a3220",
+    exercises: [
+      { name: "Loop Band Lifting (core)", sets: 3, setsLabelText: "3×12", t: 2145, tips: ["Movimiento controlado, sin flexión lumbar", "Activa transverso abdominal antes de mover"] },
+      { name: "Loop Band Side Bends", sets: 3, setsLabelText: "3×12/lado", t: 2178, tips: ["Rango corto y controlado — no fuerces la inclinación lateral"] },
+      { name: "Loop Band Glute Bridge", sets: 4, setsLabelText: "4×15", t: 1326, tips: ["Repetición del día 1 — consolidación de patrón", "Sube el tiempo de pausa arriba a 2 segundos"] },
+      { name: "Loop Band Kick Outs", sets: 3, setsLabelText: "3×10/lado", t: 1576, tips: ["Control total, sin balanceo del torso"] },
+      { name: "Loop Band Squat", sets: 3, setsLabelText: "3×12", t: 1155, tips: ["Añade pausa de 2 segundos abajo para más tensión"] },
+    ]
+  },
+  { id: "fb4", label: "Día 4", title: "Full Body + Brazos", color: "#d38a63", bg: "#3a2a20",
+    exercises: [
+      { name: "Loop Band Chest Press", sets: 3, setsLabelText: "3×12", t: 248, tips: ["De pie, ancla la liga atrás — agarre neutro"] },
+      { name: "Loop Band Hammer Curl", sets: 3, setsLabelText: "3×12", t: 1756, tips: ["Palmas enfrentadas — el único curl que va bien con tu muñeca"] },
+      { name: "Loop Band Overhead Triceps Extension", sets: 3, setsLabelText: "3×12", t: 1890, tips: ["Codos junto a las orejas, agarre neutro"] },
+      { name: "Loop Band Bent Over Reverse Grip Row", sets: 3, setsLabelText: "3×12", t: 788, tips: ["Espalda recta, bisagra leve — prioriza técnica sobre carga"] },
+      { name: "Loop Band Lunge", sets: 3, setsLabelText: "3×10/lado", t: 1249, tips: ["Cierre de sesión — mismo patrón que día 1, refuerza técnica"] },
+    ]
+  },
+];
+
+const excluded = [
+  { name: "Stiff Leg / Single Leg Deadlift", reason: "Bisagra de cadera con tensión de banda comprime directamente L5-S1." },
+  { name: "Todas las variantes de Push Up (Hanging Dip, Resisted, Close Grip, Alternating)", reason: "Cargan la palma en extensión — directo al quiste de la muñeca derecha." },
+  { name: "Loop Band Upright Row", reason: "Alto riesgo de pinzamiento de hombro sin beneficio extra sobre otros ejercicios ya incluidos." },
+];
+
+const adviceItems = [
+  { icon: "⏰", title: "Hazlo primero", body: "La rutina de movilidad va antes que cualquier otra cosa del día — o mínimo antes del entrenamiento. El cuerpo lleva horas en posición fetal durmiendo. Moverlo antes de estresarlo es la diferencia entre progresar y lesionarse." },
+  { icon: "🌡️", title: "Nunca en frío agresivo", body: "Los estiramientos son estáticos suaves — eso está bien en frío. Si hace mucho frío en tu espacio, camina 1-2 min en tu lugar antes de empezar." },
+  { icon: "🪑", title: "Corrección postural en el trabajo", body: "Como diseñador frente a pantallas, la postura de trabajo es igual de importante que la rutina. Monitor al nivel de los ojos, codos a 90°, levántate cada 45 min." },
+  { icon: "📐", title: "El desnivel pélvico requiere asimetría", body: "No estires igual ambos lados. En 90/90 y flexores de cadera, dedica 10s extra al lado más tenso." },
+  { icon: "📈", title: "Progresión es clave", body: "Las primeras 2 semanas no fuerces el rango. El tejido conectivo tarda 6-8 semanas en adaptarse." },
+  { icon: "🚫", title: "Señales de parada inmediata", body: "Para si aparece: hormigueo o entumecimiento en piernas/pies, dolor que baja por la pierna, dolor agudo en zona lumbar." },
+  { icon: "💧", title: "Hidratación y disco intervertebral", body: "El disco L5-S1 se hidrata principalmente durante el sueño. Apunta a 2L diarios como mínimo." },
+  { icon: "🔄", title: "Combínala con Fit Gent", body: "La rutina de movilidad calienta y prepara. Fit Gent consolida la fuerza. Orden ideal: movilidad → Fit Gent → cardio opcional." },
+];
+
+// ═══════════════ RENDER: MOVILIDAD (siempre visible + checks) ═══════════════
+
+function renderStretch() {
+  const routineId = 'stretch';
+  const totalSets = stretchExercises.map(e => e.sets);
+  const done = completedCount(routineId, totalSets);
+  const total = stretchExercises.length;
+
+  document.getElementById('stretch-count').textContent = `${done}/${total} completados`;
+  document.getElementById('stretch-progress').innerHTML = stretchExercises.map((ex, i) => `
+    <div class="prog-seg ${isExerciseComplete(routineId, i, ex.sets) ? 'done' : ''}"></div>`).join('');
+
+  document.getElementById('stretch-complete-banner').innerHTML = (done === total)
+    ? `<div class="day-complete-banner">✓ Rutina de movilidad completada hoy</div>` : '';
+
+  const el = document.getElementById('stretch-exercises');
+  el.innerHTML = stretchExercises.map((ex, i) => {
+    const complete = isExerciseComplete(routineId, i, ex.sets);
+    const embedUrl = `https://www.youtube.com/embed/${ex.embedId}?rel=0`;
+    return `
+    <div class="ex-card2 ${complete ? 'completed' : ''}">
+      <div class="ex-card2-head">
+        <div class="ex-num2" style="background:${ex.bg}; color:${ex.color};">${i+1}</div>
+        <div class="ex-name2">${ex.name}</div>
+        <div class="ex-sets2">${ex.duration}</div>
+        <button class="ex-check-btn ${complete ? 'checked' : ''}" onclick="quickCompleteStretch(${i})" title="Marcar completo">✓</button>
+      </div>
+      <div class="video-wrap2">
+        <iframe src="${embedUrl}" title="${ex.name}" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      </div>
+      <div class="why-box2" style="background:${ex.bg}; border-left-color:${ex.color}; margin-top:0.8rem;">
+        <span class="why-label2" style="color:${ex.color};">Por qué funciona</span>
+        ${ex.why}
+      </div>
+      <div class="ex-tips2">
+        ${ex.how.map(s => `<div class="tip-row2"><div class="tip-dot2" style="background:${ex.color};"></div><span class="tip-text2">${s}</span></div>`).join('')}
+      </div>
+      ${ex.caution ? `<div class="caution-box2">⚠️ ${ex.caution}</div>` : ''}
+      <div class="set-tracker">
+        ${Array.from({length: ex.sets}).map((_, s) => {
+          const setDone = getSetState(routineId, i, s);
+          const label = ex.setLabel ? ex.setLabel[s] : `Serie ${s+1}`;
+          return `<div class="set-pill ${setDone ? 'done' : ''}" onclick="toggleSet('${routineId}', ${i}, ${s}, ${ex.sets})">
+            <span class="sp-label">${label}</span>
+            <span class="sp-mark">${setDone ? '✓' : '○'}</span>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function quickCompleteStretch(exIndex) {
+  const routineId = 'stretch';
+  const ex = stretchExercises[exIndex];
+  const complete = isExerciseComplete(routineId, exIndex, ex.sets);
+  for (let s = 0; s < ex.sets; s++) {
+    const key = `${routineId}:${todayKey()}`;
+    if (!progress[key]) progress[key] = {};
+    if (!progress[key][exIndex]) progress[key][exIndex] = {};
+    progress[key][exIndex][s] = !complete;
+  }
+  saveProgress(progress);
+  renderStretch();
+  renderWeekSummary();
+}
+
+function toggleSet(routineId, exIndex, setIndex, totalSets) {
+  toggleSetState(routineId, exIndex, setIndex);
+  if (routineId === 'stretch') renderStretch();
+  else renderFullbody();
+  renderWeekSummary();
+}
+
+// ═══════════════ RENDER: FIT GENT (siempre visible + video embebido + checks) ═══════════════
+
+let fullbodyActiveDay = "fb1";
+
+function renderFullbody() {
+  const tabsEl = document.getElementById('fullbody-day-tabs');
+  tabsEl.innerHTML = fullbodyDays.map(d => {
+    const routineId = `fb-${d.id}`;
+    const totalSets = d.exercises.map(e => e.sets);
+    const done = completedCount(routineId, totalSets);
+    const isFull = done === d.exercises.length;
+    return `
+    <div class="day-tab" style="border-color:${fullbodyActiveDay===d.id?d.color:'var(--line)'}; background:${fullbodyActiveDay===d.id?d.color:'var(--paper-raised)'}; color:${fullbodyActiveDay===d.id?'#0e0d0b':'var(--text)'};"
+      onclick="setFullbodyDay('${d.id}')">${d.label}${isFull ? '<span class="dt-check">✓</span>' : ''}</div>`;
+  }).join('');
+
+  const day = fullbodyDays.find(d => d.id === fullbodyActiveDay);
+  const routineId = `fb-${day.id}`;
+  const totalSets = day.exercises.map(e => e.sets);
+  const done = completedCount(routineId, totalSets);
+  const total = day.exercises.length;
+
+  document.getElementById('fb-day-title').textContent = day.title;
+  document.getElementById('fb-day-count').textContent = `${done}/${total} completados`;
+  document.getElementById('fb-progress').innerHTML = day.exercises.map((ex, i) => `
+    <div class="prog-seg ${isExerciseComplete(routineId, i, ex.sets) ? 'done' : ''}"></div>`).join('');
+  document.getElementById('fb-complete-banner').innerHTML = (done === total)
+    ? `<div class="day-complete-banner">✓ ${day.title} completado hoy</div>` : '';
+
+  const exEl = document.getElementById('fullbody-exercises');
+  exEl.innerHTML = day.exercises.map((ex, i) => {
+    const embedUrl = `https://www.youtube.com/embed/${VIDEO_ID}?start=${ex.t}&rel=0`;
+    const complete = isExerciseComplete(routineId, i, ex.sets);
+    return `
+    <div class="ex-card2 ${complete ? 'completed' : ''}">
+      <div class="ex-card2-head">
+        <div class="ex-num2" style="background:${day.bg}; color:${day.color};">${i+1}</div>
+        <div class="ex-name2">${ex.name}</div>
+        <div class="ex-sets2">${ex.setsLabelText}</div>
+        <button class="ex-check-btn ${complete ? 'checked' : ''}" onclick="quickCompleteFb(${i})" title="Marcar completo">✓</button>
+      </div>
+      <div class="video-wrap2">
+        <iframe src="${embedUrl}" title="${ex.name}" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      </div>
+      <div class="ex-tips2" style="margin-top:0.8rem;">
+        ${ex.tips.map(t => `<div class="tip-row2"><div class="tip-dot2" style="background:${day.color};"></div><span class="tip-text2">${t}</span></div>`).join('')}
+      </div>
+      <div class="set-tracker">
+        ${Array.from({length: ex.sets}).map((_, s) => {
+          const setDone = getSetState(routineId, i, s);
+          return `<div class="set-pill ${setDone ? 'done' : ''}" onclick="toggleSet('${routineId}', ${i}, ${s}, ${ex.sets})">
+            <span class="sp-label">Serie ${s+1}</span>
+            <span class="sp-mark">${setDone ? '✓' : '○'}</span>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+  }).join('');
+
+  const idx = fullbodyDays.findIndex(d => d.id === fullbodyActiveDay);
+  const prev = fullbodyDays[idx - 1];
+  const next = fullbodyDays[idx + 1];
+  exEl.innerHTML += `
+    <div class="day-nav-buttons">
+      <button class="day-nav-btn" ${!prev ? 'disabled' : ''} onclick="${prev ? `setFullbodyDay('${prev.id}')` : ''}">← ${prev ? prev.label : ''}</button>
+      <button class="day-nav-btn primary" ${!next ? 'disabled' : ''} onclick="${next ? `setFullbodyDay('${next.id}')` : ''}">${next ? next.label : 'Fin del ciclo'} →</button>
+    </div>`;
+}
+
+function quickCompleteFb(exIndex) {
+  const routineId = `fb-${fullbodyActiveDay}`;
+  const day = fullbodyDays.find(d => d.id === fullbodyActiveDay);
+  const ex = day.exercises[exIndex];
+  const complete = isExerciseComplete(routineId, exIndex, ex.sets);
+  for (let s = 0; s < ex.sets; s++) {
+    const key = `${routineId}:${todayKey()}`;
+    if (!progress[key]) progress[key] = {};
+    if (!progress[key][exIndex]) progress[key][exIndex] = {};
+    progress[key][exIndex][s] = !complete;
+  }
+  saveProgress(progress);
+  renderFullbody();
+  renderWeekSummary();
+}
+
+function setFullbodyDay(id) {
+  fullbodyActiveDay = id;
+  renderFullbody();
+  document.getElementById('view-fullbody').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function renderExcluded() {
+  document.getElementById('excl-list').innerHTML = excluded.map(ex => `
+    <div class="excl-item"><div class="e-name">${ex.name}</div><div class="e-reason">${ex.reason}</div></div>`).join('');
+}
+function toggleExcluded() { document.getElementById('excl-list').classList.toggle('open'); }
+
+function renderAdvice() {
+  document.getElementById('advice-cards').innerHTML = adviceItems.map((tip, i) => `
+    <div class="advice-card" id="advice-${i}">
+      <button class="advice-head" onclick="toggleAdvice(${i})">
+        <span class="advice-icon">${tip.icon}</span>
+        <span class="advice-title">${tip.title}</span>
+        <span class="chevron advice-chevron">›</span>
+      </button>
+      <div class="advice-body">${tip.body}</div>
+    </div>`).join('');
+}
+function toggleAdvice(i) { document.getElementById(`advice-${i}`).classList.toggle('open'); }
+
+// ═══════════════ WEEK SUMMARY (header) ═══════════════
+// Shows last 7 days: complete (both mobility done + at least one fb day fully done that day), partial, or empty.
+
+function renderWeekSummary() {
+  const el = document.getElementById('week-summary');
+  const days = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    days.push(key);
+  }
+  el.innerHTML = days.map(dayKey => {
+    let anyDone = false, allDone = true, sawAny = false;
+    const stretchKey = `stretch:${dayKey}`;
+    if (progress[stretchKey]) {
+      sawAny = true;
+      const done = stretchExercises.filter((ex, i) => {
+        const data = progress[stretchKey][i];
+        if (!data) return false;
+        let c = 0; for (let s = 0; s < ex.sets; s++) if (data[s]) c++;
+        return c === ex.sets;
+      }).length;
+      if (done > 0) anyDone = true;
+      if (done < stretchExercises.length) allDone = false;
+    } else { allDone = false; }
+
+    fullbodyDays.forEach(fd => {
+      const k = `fb-${fd.id}:${dayKey}`;
+      if (progress[k]) {
+        sawAny = true;
+        const done = fd.exercises.filter((ex, i) => {
+          const data = progress[k][i];
+          if (!data) return false;
+          let c = 0; for (let s = 0; s < ex.sets; s++) if (data[s]) c++;
+          return c === ex.sets;
+        }).length;
+        if (done > 0) anyDone = true;
+      }
+    });
+
+    let cls = '';
+    if (sawAny && anyDone) cls = allDone ? 'complete' : 'partial';
+    return `<div class="week-summary-day ${cls}" title="${dayKey}"></div>`;
+  }).join('');
+}
+
+// ═══════════════ NAV ═══════════════
+
+document.querySelectorAll('.nav-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('view-' + btn.dataset.view).classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+});
+
+// ═══════════════ INIT ═══════════════
+
+renderStretch();
+renderFullbody();
+renderExcluded();
+renderAdvice();
+renderWeekSummary();
+</script>
+
+</body>
+</html>
