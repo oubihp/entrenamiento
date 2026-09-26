@@ -85,6 +85,35 @@
   .hr-range span { color: var(--clay); }
   .hr-note { font-size: 0.78rem; color: var(--muted); line-height: 1.6; }
 
+  /* ── NUTRITION ── */
+  .macro-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem; margin-bottom: 1.25rem; }
+  .macro-card { background: var(--paper-raised); border: 1.5px solid var(--line); border-radius: 10px; padding: 0.8rem 0.6rem; text-align: center; }
+  .macro-card .m-label { font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.3rem; }
+  .macro-card .m-val { font-family: 'Fraunces', serif; font-size: 1.35rem; font-weight: 600; color: #f5f1e8; }
+  .macro-card .m-unit { font-size: 0.68rem; color: var(--muted); }
+
+  .calc-row { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid var(--line-soft); font-size: 0.8rem; }
+  .calc-row:last-child { border-bottom: none; }
+  .calc-row .c-label { color: var(--muted); }
+  .calc-row .c-val { font-family: 'JetBrains Mono', monospace; color: var(--text); font-weight: 500; }
+
+  .food-list { display: flex; flex-direction: column; gap: 0.5rem; }
+  .food-item { display: flex; align-items: flex-start; gap: 0.6rem; padding: 0.7rem 0.85rem; background: var(--paper-raised); border: 1px solid var(--line); border-radius: 8px; }
+  .food-icon { font-size: 1.1rem; flex-shrink: 0; }
+  .food-name { font-size: 0.82rem; font-weight: 600; color: var(--text); margin-bottom: 0.15rem; }
+  .food-note { font-size: 0.75rem; color: var(--muted); line-height: 1.5; }
+
+  .weigh-tracker { background: var(--paper-raised-2); border: 1px solid var(--line); border-radius: 10px; padding: 1rem; margin-top: 1rem; }
+  .weigh-input-row { display: flex; gap: 0.5rem; margin-top: 0.7rem; }
+  .weigh-input { flex: 1; padding: 0.6rem 0.7rem; background: var(--paper); border: 1.5px solid var(--line); border-radius: 7px; color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; }
+  .weigh-input::placeholder { color: var(--muted); }
+  .weigh-add-btn { padding: 0.6rem 1rem; background: var(--clay); border: none; border-radius: 7px; color: var(--ink); font-weight: 600; font-size: 0.8rem; cursor: pointer; }
+  .weigh-log { margin-top: 0.8rem; display: flex; flex-direction: column; gap: 0.3rem; max-height: 160px; overflow-y: auto; }
+  .weigh-log-row { display: flex; justify-content: space-between; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--muted); padding: 0.25rem 0; }
+  .weigh-log-row .w-val { color: var(--text); font-weight: 500; }
+  .weigh-trend { margin-top: 0.7rem; padding: 0.6rem 0.7rem; border-radius: 7px; font-size: 0.78rem; }
+
+
   /* ── EXCLUDED ── */
   .excl-toggle { width: 100%; padding: 0.75rem 0.9rem; background: var(--danger-dim); border: 1.5px solid #5c2f28; border-radius: 10px; cursor: pointer; text-align: left; font-size: 0.78rem; font-weight: 600; color: var(--danger); margin-top: 1rem; }
   .excl-list { display: none; margin-top: 0.55rem; flex-direction: column; gap: 0.5rem; }
@@ -167,6 +196,13 @@
   .condition-tags { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.9rem; }
   .condition-chip { font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; padding: 0.32rem 0.65rem; border: 1px solid var(--line); border-radius: 3px; color: var(--muted); letter-spacing: 0.02em; }
 
+  .history-row { display: flex; align-items: center; gap: 0.6rem; padding: 0.55rem 0; border-bottom: 1px solid var(--line-soft); }
+  .history-row:last-child { border-bottom: none; }
+  .history-date { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: var(--text); min-width: 90px; }
+  .history-badges { display: flex; gap: 0.35rem; flex-wrap: wrap; }
+  .history-badge { font-size: 0.65rem; padding: 0.15rem 0.5rem; border-radius: 12px; font-weight: 600; }
+  .history-empty { font-size: 0.8rem; color: var(--muted); font-style: italic; padding: 0.5rem 0; }
+
   @media (max-width: 480px) { .masthead h1 { font-size: 1.55rem; } }
 </style>
 </head>
@@ -183,6 +219,7 @@
   <button class="nav-btn active" data-view="stretch">Movilidad · 10 min</button>
   <button class="nav-btn" data-view="fullbody">Full Body · Fit Gent</button>
   <button class="nav-btn" data-view="cardio">Cardio &amp; HR</button>
+  <button class="nav-btn" data-view="nutrition">Nutrición</button>
   <button class="nav-btn" data-view="advice">Consejos</button>
   <button class="nav-btn" data-view="notes">Notas</button>
 </div>
@@ -251,6 +288,101 @@
   </div>
 </div>
 
+<!-- ══════════════ NUTRICIÓN ══════════════ -->
+<div class="view" id="view-nutrition">
+  <div class="section-label">Déficit calórico · Sin cocinar</div>
+  <div class="section-title">Nutrición</div>
+
+  <div class="macro-grid">
+    <div class="macro-card">
+      <div class="m-label">Objetivo diario</div>
+      <div class="m-val">2,050</div>
+      <div class="m-unit">kcal</div>
+    </div>
+    <div class="macro-card">
+      <div class="m-label">Proteína</div>
+      <div class="m-val">130-150</div>
+      <div class="m-unit">g / día</div>
+    </div>
+    <div class="macro-card">
+      <div class="m-label">Déficit</div>
+      <div class="m-val">~17%</div>
+      <div class="m-unit">vs. mantenimiento</div>
+    </div>
+  </div>
+
+  <div class="info-card" style="border-left: 3px solid var(--slate);">
+    <div class="info-card-title">Cómo se calculó (Mifflin-St Jeor)</div>
+    <div class="calc-row"><span class="c-label">Peso / Estatura / Edad</span><span class="c-val">82 kg · 172 cm · 39a</span></div>
+    <div class="calc-row"><span class="c-label">TMB (metabolismo basal)</span><span class="c-val">1,705 kcal</span></div>
+    <div class="calc-row"><span class="c-label">Actividad (oficina + caminatas + Fit Gent)</span><span class="c-val">×1.45</span></div>
+    <div class="calc-row"><span class="c-label">Mantenimiento estimado (TDEE)</span><span class="c-val">~2,470 kcal</span></div>
+    <div class="calc-row"><span class="c-label">Déficit aplicado (15-20%)</span><span class="c-val">−400 a −470 kcal</span></div>
+    <div class="calc-row"><span class="c-label"><strong style="color:var(--text);">Objetivo diario</strong></span><span class="c-val"><strong style="color:var(--moss);">~2,050 kcal</strong></span></div>
+  </div>
+
+  <div class="info-card" style="border-left: 3px solid var(--ochre);">
+    <div class="info-card-title">Por qué no más agresivo</div>
+    <div class="info-card-body">Con tu volumen de entrenamiento y las restricciones de L5-S1 y muñeca, un déficit mayor al 20% aumenta el riesgo de fatiga que compromete la técnica — justo lo que no te puedes permitir con esas condiciones. Este rango pierde grasa sin sacrificar recuperación.</div>
+  </div>
+
+  <div class="section-label" style="margin-top: 1.5rem;">Sistema flexible</div>
+  <div class="section-title" style="font-size: 1.15rem;">Reglas, no menú fijo</div>
+
+  <div class="info-card" style="border-left: 3px solid var(--moss); margin-bottom: 1rem;">
+    <div class="info-card-body">Reparte las ~2,050 kcal en 3-4 comidas, priorizando proteína en cada una. No necesitas pesar ni preparar nada — la disciplina está en elegir bien de lo que ya compras o pides.</div>
+  </div>
+
+  <div class="food-list">
+    <div class="food-item">
+      <span class="food-icon">🍗</span>
+      <div>
+        <div class="food-name">Rotisería o pollo asado (Sadot, Pollo Feliz)</div>
+        <div class="food-note">Pechuga o pierna sin piel — proteína más barata y accesible sin cocinar.</div>
+      </div>
+    </div>
+    <div class="food-item">
+      <span class="food-icon">🥗</span>
+      <div>
+        <div class="food-name">Ensaladas preparadas (Sushi Itto, VIPS, Sanborns)</div>
+        <div class="food-note">Pide proteína extra para subir el total de gramos por comida.</div>
+      </div>
+    </div>
+    <div class="food-item">
+      <span class="food-icon">🥚</span>
+      <div>
+        <div class="food-name">Yogurt griego, requesón, huevo cocido</div>
+        <div class="food-note">5 minutos de preparación real — ideal para desayuno rápido.</div>
+      </div>
+    </div>
+    <div class="food-item">
+      <span class="food-icon">🍱</span>
+      <div>
+        <div class="food-name">Poke bowls o bowls de proteína</div>
+        <div class="food-note">Cada vez más comunes en CDMX — buen balance de proteína y volumen.</div>
+      </div>
+    </div>
+    <div class="food-item">
+      <span class="food-icon">🥤</span>
+      <div>
+        <div class="food-name">Proteína en polvo</div>
+        <div class="food-note">Si no llegas a los gramos de proteína del día, un scoop cubre 25-30g en 30 segundos.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="weigh-tracker">
+    <div class="info-card-title" style="margin-bottom:0.3rem;">Seguimiento de peso</div>
+    <div class="info-card-body">Pésate 2-3 veces por semana en ayunas. Lo que importa es la tendencia semanal, no el número de un solo día.</div>
+    <div class="weigh-input-row">
+      <input type="number" step="0.1" class="weigh-input" id="weigh-input" placeholder="Peso de hoy (kg)">
+      <button class="weigh-add-btn" onclick="addWeighIn()">Guardar</button>
+    </div>
+    <div class="weigh-log" id="weigh-log"></div>
+    <div id="weigh-trend"></div>
+  </div>
+</div>
+
 <!-- ══════════════ CONSEJOS ══════════════ -->
 <div class="view" id="view-advice">
   <div class="section-label">Principios generales</div>
@@ -289,6 +421,17 @@
     <div class="note-card-title">Objetivo del programa</div>
     <div class="note-card-body">Fuerza general y reducción de grasa corporal, partiendo de una base de fitness casi nula. El déficit calórico total semanal es lo que determina la pérdida de grasa — el cardio en zona 108-127 bpm es complementario, no la variable principal.</div>
   </div>
+
+  <div class="note-card" id="storage-status-card" style="display:none;">
+    <div class="note-card-title" style="color: var(--danger);">⚠️ Almacenamiento no disponible</div>
+    <div class="note-card-body">Este navegador o modo de vista no permite guardar datos localmente (común en modo incógnito o algunas vistas previas embebidas). Tu progreso NO se guardará entre sesiones aquí. Ábrelo en un navegador normal o desde tu GitHub Pages directamente para que el registro funcione.</div>
+  </div>
+
+  <div class="note-card">
+    <div class="note-card-title">Historial completo de días registrados</div>
+    <div class="note-card-body">Todos los días que has marcado como completados, en cualquier rutina, permanecen guardados aquí — no se borran al cambiar de día ni al cerrar la aplicación.</div>
+    <div id="history-list" style="margin-top: 0.8rem;"></div>
+  </div>
 </div>
 
 <script>
@@ -307,6 +450,19 @@ function saveProgress(data) {
   try { localStorage.setItem(STORE_KEY, JSON.stringify(data)); } catch (e) {}
 }
 let progress = loadProgress();
+
+// Diagnostic: confirm localStorage actually persists in this browser/context.
+// Some embedded/private contexts silently disable persistent storage.
+function checkStoragePersistence() {
+  try {
+    const testKey = '__storage_test__';
+    localStorage.setItem(testKey, '1');
+    const ok = localStorage.getItem(testKey) === '1';
+    localStorage.removeItem(testKey);
+    return ok;
+  } catch (e) { return false; }
+}
+const storageWorks = checkStoragePersistence();
 
 function todayKey() {
   const d = new Date();
@@ -342,6 +498,7 @@ function resetDay(routineId) {
   if (routineId === 'stretch') renderStretch();
   else renderFullbody();
   renderWeekSummary();
+  renderHistory();
 }
 
 // ═══════════════ DATA: MOVILIDAD (10 min, con video embebido) ═══════════════
@@ -366,7 +523,7 @@ const stretchExercises = [
     why: "Activa multífido y transverso abdominal — estabilizadores profundos de L5-S1. El ejercicio con más respaldo científico de toda la rutina.",
     how: ["Cuadrupedia, activa abdomen antes de mover", "Extiende brazo y pierna opuestos, muy despacio", "Caderas niveladas, 3s arriba, baja controlado"],
     embedId: "MEKThiUpdyc", caution: null },
-  { name: "Plancha en codos", sets: 2, setLabel: ["Serie 1", "Serie 2"], duration: "2 min · 2×25-30s", color: "#7fae82", bg: "#2a3a2b",
+  { name: "Plancha en codos", sets: 3, setLabel: ["Serie 1", "Serie 2", "Serie 3"], duration: "2 min · 3×20-25s", color: "#7fae82", bg: "#2a3a2b",
     why: "Cierra la rutina activando el core completo sin flexión lumbar. Puente directo hacia el entrenamiento de fuerza.",
     how: ["Codos bajo hombros, línea recta cabeza-talones", "Aprieta ligeramente glúteos", "Respira normal — no aguantes la respiración"],
     embedId: "X4k-fC-ubrI", caution: null },
@@ -388,9 +545,9 @@ const fullbodyDays = [
   },
   { id: "fb2", label: "Día 2", title: "Espalda + Hombro", color: "#8fa8c2", bg: "#26323f",
     exercises: [
-      { name: "Loop Band Seated Reverse Grip Row", sets: 4, setsLabelText: "4×12", t: 491, tips: ["Agarre neutro/reverso — cero estrés en muñeca", "Tira con los codos, espalda recta"] },
+      { name: "Loop Band Seated Reverse Grip Row", sets: 4, setsLabelText: "4×15", t: 491, tips: ["Agarre neutro/reverso — cero estrés en muñeca", "Tira con los codos, espalda recta", "Ejercicio prioritario: más volumen aquí que en el bent over por ser más seguro para tu L5-S1"] },
       { name: "Loop Band Seated Facepulls", sets: 3, setsLabelText: "3×15", t: 747, tips: ["Tira hacia la cara, codos altos", "Excelente para postura — aprieta omóplatos"] },
-      { name: "Loop Band Bent Over Row", sets: 4, setsLabelText: "4×12", t: 419, tips: ["Bisagra de cadera MUY leve — rodillas más dobladas para proteger L5-S1", "Si sientes tensión lumbar, cambia a la versión sentada"] },
+      { name: "Loop Band Bent Over Row", sets: 3, setsLabelText: "3×10", t: 419, tips: ["Bisagra de cadera MUY leve — rodillas más dobladas para proteger L5-S1", "Si sientes tensión lumbar, cambia a la versión sentada", "Volumen reducido a propósito: es el ejercicio de mayor riesgo relativo del día"] },
       { name: "Loop Band Standing Back Fly", sets: 3, setsLabelText: "3×12", t: 661, tips: ["Torso ligeramente inclinado, brazos casi rectos"] },
       { name: "Loop Band Shoulder Press", sets: 3, setsLabelText: "3×10", t: 970, tips: ["Agarre neutro — pulgares hacia atrás", "No arquees la espalda al empujar arriba"] },
       { name: "Loop Band Lateral Raise", sets: 3, setsLabelText: "3×12", t: 1002, tips: ["Codos con ligerísima flexión, sube hasta altura de hombro"] },
@@ -443,46 +600,72 @@ function renderStretch() {
 
   document.getElementById('stretch-count').textContent = `${done}/${total} completados`;
   document.getElementById('stretch-progress').innerHTML = stretchExercises.map((ex, i) => `
-    <div class="prog-seg ${isExerciseComplete(routineId, i, ex.sets) ? 'done' : ''}"></div>`).join('');
+    <div class="prog-seg" data-idx="${i}"></div>`).join('');
 
   document.getElementById('stretch-complete-banner').innerHTML = (done === total)
     ? `<div class="day-complete-banner">✓ Rutina de movilidad completada hoy</div>` : '';
 
   const el = document.getElementById('stretch-exercises');
-  el.innerHTML = stretchExercises.map((ex, i) => {
+
+  // Only build the cards from scratch the first time (or when the day changes).
+  // Every other call just flips classes/text so the <iframe> is never recreated.
+  if (el.dataset.builtFor !== todayKey()) {
+    el.innerHTML = stretchExercises.map((ex, i) => {
+      const embedUrl = `https://www.youtube.com/embed/${ex.embedId}?rel=0`;
+      return `
+      <div class="ex-card2" data-ex="${i}">
+        <div class="ex-card2-head">
+          <div class="ex-num2" style="background:${ex.bg}; color:${ex.color};">${i+1}</div>
+          <div class="ex-name2">${ex.name}</div>
+          <div class="ex-sets2">${ex.duration}</div>
+          <button class="ex-check-btn" data-check="${i}" onclick="quickCompleteStretch(${i})" title="Marcar completo">✓</button>
+        </div>
+        <div class="video-wrap2">
+          <iframe src="${embedUrl}" title="${ex.name}" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <div class="why-box2" style="background:${ex.bg}; border-left-color:${ex.color}; margin-top:0.8rem;">
+          <span class="why-label2" style="color:${ex.color};">Por qué funciona</span>
+          ${ex.why}
+        </div>
+        <div class="ex-tips2">
+          ${ex.how.map(s => `<div class="tip-row2"><div class="tip-dot2" style="background:${ex.color};"></div><span class="tip-text2">${s}</span></div>`).join('')}
+        </div>
+        ${ex.caution ? `<div class="caution-box2">⚠️ ${ex.caution}</div>` : ''}
+        <div class="set-tracker" data-sets="${i}">
+          ${Array.from({length: ex.sets}).map((_, s) => {
+            const label = ex.setLabel ? ex.setLabel[s] : `Serie ${s+1}`;
+            return `<div class="set-pill" data-set="${s}" onclick="toggleSet('${routineId}', ${i}, ${s}, ${ex.sets})">
+              <span class="sp-label">${label}</span>
+              <span class="sp-mark"></span>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>`;
+    }).join('');
+    el.dataset.builtFor = todayKey();
+  }
+
+  // Update visual state only — never touches the iframe src.
+  stretchExercises.forEach((ex, i) => {
     const complete = isExerciseComplete(routineId, i, ex.sets);
-    const embedUrl = `https://www.youtube.com/embed/${ex.embedId}?rel=0`;
-    return `
-    <div class="ex-card2 ${complete ? 'completed' : ''}">
-      <div class="ex-card2-head">
-        <div class="ex-num2" style="background:${ex.bg}; color:${ex.color};">${i+1}</div>
-        <div class="ex-name2">${ex.name}</div>
-        <div class="ex-sets2">${ex.duration}</div>
-        <button class="ex-check-btn ${complete ? 'checked' : ''}" onclick="quickCompleteStretch(${i})" title="Marcar completo">✓</button>
-      </div>
-      <div class="video-wrap2">
-        <iframe src="${embedUrl}" title="${ex.name}" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-      </div>
-      <div class="why-box2" style="background:${ex.bg}; border-left-color:${ex.color}; margin-top:0.8rem;">
-        <span class="why-label2" style="color:${ex.color};">Por qué funciona</span>
-        ${ex.why}
-      </div>
-      <div class="ex-tips2">
-        ${ex.how.map(s => `<div class="tip-row2"><div class="tip-dot2" style="background:${ex.color};"></div><span class="tip-text2">${s}</span></div>`).join('')}
-      </div>
-      ${ex.caution ? `<div class="caution-box2">⚠️ ${ex.caution}</div>` : ''}
-      <div class="set-tracker">
-        ${Array.from({length: ex.sets}).map((_, s) => {
-          const setDone = getSetState(routineId, i, s);
-          const label = ex.setLabel ? ex.setLabel[s] : `Serie ${s+1}`;
-          return `<div class="set-pill ${setDone ? 'done' : ''}" onclick="toggleSet('${routineId}', ${i}, ${s}, ${ex.sets})">
-            <span class="sp-label">${label}</span>
-            <span class="sp-mark">${setDone ? '✓' : '○'}</span>
-          </div>`;
-        }).join('')}
-      </div>
-    </div>`;
-  }).join('');
+    const card = el.querySelector(`.ex-card2[data-ex="${i}"]`);
+    if (card) card.classList.toggle('completed', complete);
+    const btn = el.querySelector(`.ex-check-btn[data-check="${i}"]`);
+    if (btn) btn.classList.toggle('checked', complete);
+    const seg = document.querySelector(`#stretch-progress .prog-seg[data-idx="${i}"]`);
+    if (seg) seg.classList.toggle('done', complete);
+    const tracker = el.querySelector(`.set-tracker[data-sets="${i}"]`);
+    if (tracker) {
+      for (let s = 0; s < ex.sets; s++) {
+        const setDone = getSetState(routineId, i, s);
+        const pill = tracker.querySelector(`.set-pill[data-set="${s}"]`);
+        if (pill) {
+          pill.classList.toggle('done', setDone);
+          pill.querySelector('.sp-mark').textContent = setDone ? '✓' : '○';
+        }
+      }
+    }
+  });
 }
 
 function quickCompleteStretch(exIndex) {
@@ -498,6 +681,7 @@ function quickCompleteStretch(exIndex) {
   saveProgress(progress);
   renderStretch();
   renderWeekSummary();
+  renderHistory();
 }
 
 function toggleSet(routineId, exIndex, setIndex, totalSets) {
@@ -505,6 +689,7 @@ function toggleSet(routineId, exIndex, setIndex, totalSets) {
   if (routineId === 'stretch') renderStretch();
   else renderFullbody();
   renderWeekSummary();
+  renderHistory();
 }
 
 // ═══════════════ RENDER: FIT GENT (siempre visible + video embebido + checks) ═══════════════
@@ -532,48 +717,73 @@ function renderFullbody() {
   document.getElementById('fb-day-title').textContent = day.title;
   document.getElementById('fb-day-count').textContent = `${done}/${total} completados`;
   document.getElementById('fb-progress').innerHTML = day.exercises.map((ex, i) => `
-    <div class="prog-seg ${isExerciseComplete(routineId, i, ex.sets) ? 'done' : ''}"></div>`).join('');
+    <div class="prog-seg" data-idx="${i}"></div>`).join('');
   document.getElementById('fb-complete-banner').innerHTML = (done === total)
     ? `<div class="day-complete-banner">✓ ${day.title} completado hoy</div>` : '';
 
   const exEl = document.getElementById('fullbody-exercises');
-  exEl.innerHTML = day.exercises.map((ex, i) => {
-    const embedUrl = `https://www.youtube.com/embed/${VIDEO_ID}?start=${ex.t}&rel=0`;
-    const complete = isExerciseComplete(routineId, i, ex.sets);
-    return `
-    <div class="ex-card2 ${complete ? 'completed' : ''}">
-      <div class="ex-card2-head">
-        <div class="ex-num2" style="background:${day.bg}; color:${day.color};">${i+1}</div>
-        <div class="ex-name2">${ex.name}</div>
-        <div class="ex-sets2">${ex.setsLabelText}</div>
-        <button class="ex-check-btn ${complete ? 'checked' : ''}" onclick="quickCompleteFb(${i})" title="Marcar completo">✓</button>
-      </div>
-      <div class="video-wrap2">
-        <iframe src="${embedUrl}" title="${ex.name}" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-      </div>
-      <div class="ex-tips2" style="margin-top:0.8rem;">
-        ${ex.tips.map(t => `<div class="tip-row2"><div class="tip-dot2" style="background:${day.color};"></div><span class="tip-text2">${t}</span></div>`).join('')}
-      </div>
-      <div class="set-tracker">
-        ${Array.from({length: ex.sets}).map((_, s) => {
-          const setDone = getSetState(routineId, i, s);
-          return `<div class="set-pill ${setDone ? 'done' : ''}" onclick="toggleSet('${routineId}', ${i}, ${s}, ${ex.sets})">
-            <span class="sp-label">Serie ${s+1}</span>
-            <span class="sp-mark">${setDone ? '✓' : '○'}</span>
-          </div>`;
-        }).join('')}
-      </div>
-    </div>`;
-  }).join('');
+  const buildKey = `${fullbodyActiveDay}:${todayKey()}`;
 
-  const idx = fullbodyDays.findIndex(d => d.id === fullbodyActiveDay);
-  const prev = fullbodyDays[idx - 1];
-  const next = fullbodyDays[idx + 1];
-  exEl.innerHTML += `
-    <div class="day-nav-buttons">
-      <button class="day-nav-btn" ${!prev ? 'disabled' : ''} onclick="${prev ? `setFullbodyDay('${prev.id}')` : ''}">← ${prev ? prev.label : ''}</button>
-      <button class="day-nav-btn primary" ${!next ? 'disabled' : ''} onclick="${next ? `setFullbodyDay('${next.id}')` : ''}">${next ? next.label : 'Fin del ciclo'} →</button>
-    </div>`;
+  if (exEl.dataset.builtFor !== buildKey) {
+    exEl.innerHTML = day.exercises.map((ex, i) => {
+      const embedUrl = `https://www.youtube.com/embed/${VIDEO_ID}?start=${ex.t}&rel=0`;
+      return `
+      <div class="ex-card2" data-ex="${i}">
+        <div class="ex-card2-head">
+          <div class="ex-num2" style="background:${day.bg}; color:${day.color};">${i+1}</div>
+          <div class="ex-name2">${ex.name}</div>
+          <div class="ex-sets2">${ex.setsLabelText}</div>
+          <button class="ex-check-btn" data-check="${i}" onclick="quickCompleteFb(${i})" title="Marcar completo">✓</button>
+        </div>
+        <div class="video-wrap2">
+          <iframe src="${embedUrl}" title="${ex.name}" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <div class="ex-tips2" style="margin-top:0.8rem;">
+          ${ex.tips.map(t => `<div class="tip-row2"><div class="tip-dot2" style="background:${day.color};"></div><span class="tip-text2">${t}</span></div>`).join('')}
+        </div>
+        <div class="set-tracker" data-sets="${i}">
+          ${Array.from({length: ex.sets}).map((_, s) => `
+            <div class="set-pill" data-set="${s}" onclick="toggleSet('${routineId}', ${i}, ${s}, ${ex.sets})">
+              <span class="sp-label">Serie ${s+1}</span>
+              <span class="sp-mark"></span>
+            </div>`).join('')}
+        </div>
+      </div>`;
+    }).join('');
+
+    const idx = fullbodyDays.findIndex(d => d.id === fullbodyActiveDay);
+    const prev = fullbodyDays[idx - 1];
+    const next = fullbodyDays[idx + 1];
+    exEl.innerHTML += `
+      <div class="day-nav-buttons">
+        <button class="day-nav-btn" ${!prev ? 'disabled' : ''} onclick="${prev ? `setFullbodyDay('${prev.id}')` : ''}">← ${prev ? prev.label : ''}</button>
+        <button class="day-nav-btn primary" ${!next ? 'disabled' : ''} onclick="${next ? `setFullbodyDay('${next.id}')` : ''}">${next ? next.label : 'Fin del ciclo'} →</button>
+      </div>`;
+
+    exEl.dataset.builtFor = buildKey;
+  }
+
+  // Update visual state only — never touches the iframe src.
+  day.exercises.forEach((ex, i) => {
+    const complete = isExerciseComplete(routineId, i, ex.sets);
+    const card = exEl.querySelector(`.ex-card2[data-ex="${i}"]`);
+    if (card) card.classList.toggle('completed', complete);
+    const btn = exEl.querySelector(`.ex-check-btn[data-check="${i}"]`);
+    if (btn) btn.classList.toggle('checked', complete);
+    const seg = document.querySelector(`#fb-progress .prog-seg[data-idx="${i}"]`);
+    if (seg) seg.classList.toggle('done', complete);
+    const tracker = exEl.querySelector(`.set-tracker[data-sets="${i}"]`);
+    if (tracker) {
+      for (let s = 0; s < ex.sets; s++) {
+        const setDone = getSetState(routineId, i, s);
+        const pill = tracker.querySelector(`.set-pill[data-set="${s}"]`);
+        if (pill) {
+          pill.classList.toggle('done', setDone);
+          pill.querySelector('.sp-mark').textContent = setDone ? '✓' : '○';
+        }
+      }
+    }
+  });
 }
 
 function quickCompleteFb(exIndex) {
@@ -590,6 +800,7 @@ function quickCompleteFb(exIndex) {
   saveProgress(progress);
   renderFullbody();
   renderWeekSummary();
+  renderHistory();
 }
 
 function setFullbodyDay(id) {
@@ -664,6 +875,113 @@ function renderWeekSummary() {
   }).join('');
 }
 
+// ═══════════════ HISTORY PANEL (proves persistence across sessions) ═══════════════
+
+function renderHistory() {
+  const card = document.getElementById('storage-status-card');
+  if (card) card.style.display = storageWorks ? 'none' : 'block';
+
+  const el = document.getElementById('history-list');
+  if (!el) return;
+
+  // Collect every date that has any saved progress, across all routines.
+  const dateSet = new Set();
+  Object.keys(progress).forEach(key => {
+    const parts = key.split(':');
+    const date = parts[parts.length - 1];
+    dateSet.add(date);
+  });
+  const dates = Array.from(dateSet).sort().reverse();
+
+  if (dates.length === 0) {
+    el.innerHTML = `<div class="history-empty">Aún no hay días registrados. Marca un ejercicio como completado y aparecerá aquí.</div>`;
+    return;
+  }
+
+  el.innerHTML = dates.map(date => {
+    const badges = [];
+    const stretchKey = `stretch:${date}`;
+    if (progress[stretchKey]) {
+      const doneCount = stretchExercises.filter((ex, i) => {
+        const data = progress[stretchKey][i];
+        if (!data) return false;
+        let c = 0; for (let s = 0; s < ex.sets; s++) if (data[s]) c++;
+        return c === ex.sets;
+      }).length;
+      if (doneCount > 0) {
+        const full = doneCount === stretchExercises.length;
+        badges.push(`<span class="history-badge" style="background:${full?'var(--moss-dim)':'var(--ochre-dim)'}; color:${full?'var(--moss)':'var(--ochre)'};">Movilidad ${doneCount}/${stretchExercises.length}</span>`);
+      }
+    }
+    fullbodyDays.forEach(fd => {
+      const k = `fb-${fd.id}:${date}`;
+      if (progress[k]) {
+        const doneCount = fd.exercises.filter((ex, i) => {
+          const data = progress[k][i];
+          if (!data) return false;
+          let c = 0; for (let s = 0; s < ex.sets; s++) if (data[s]) c++;
+          return c === ex.sets;
+        }).length;
+        if (doneCount > 0) {
+          const full = doneCount === fd.exercises.length;
+          badges.push(`<span class="history-badge" style="background:${full?'var(--moss-dim)':'var(--ochre-dim)'}; color:${full?'var(--moss)':'var(--ochre)'};">${fd.label} ${doneCount}/${fd.exercises.length}</span>`);
+        }
+      }
+    });
+    if (badges.length === 0) return '';
+    return `<div class="history-row"><span class="history-date">${date}</span><div class="history-badges">${badges.join('')}</div></div>`;
+  }).join('');
+}
+
+// ═══════════════ NUTRITION: WEIGH-IN TRACKER ═══════════════
+
+const WEIGH_KEY = 'weighins_v1';
+
+function loadWeighIns() {
+  try { const raw = localStorage.getItem(WEIGH_KEY); return raw ? JSON.parse(raw) : []; }
+  catch (e) { return []; }
+}
+function saveWeighIns(data) {
+  try { localStorage.setItem(WEIGH_KEY, JSON.stringify(data)); } catch (e) {}
+}
+let weighIns = loadWeighIns();
+
+function addWeighIn() {
+  const input = document.getElementById('weigh-input');
+  const val = parseFloat(input.value);
+  if (!val || val <= 0) return;
+  weighIns.push({ date: todayKey(), weight: val });
+  weighIns.sort((a, b) => a.date.localeCompare(b.date));
+  saveWeighIns(weighIns);
+  input.value = '';
+  renderWeighIns();
+}
+
+function renderWeighIns() {
+  const logEl = document.getElementById('weigh-log');
+  const recent = weighIns.slice(-10).reverse();
+  logEl.innerHTML = recent.map(w => `
+    <div class="weigh-log-row"><span>${w.date}</span><span class="w-val">${w.weight} kg</span></div>`).join('');
+
+  const trendEl = document.getElementById('weigh-trend');
+  if (weighIns.length < 2) {
+    trendEl.innerHTML = '';
+    return;
+  }
+  const last7 = weighIns.slice(-7);
+  const first = last7[0].weight;
+  const last = last7[last7.length - 1].weight;
+  const diff = (last - first).toFixed(1);
+  const isDown = diff < 0;
+  const isFlat = Math.abs(diff) < 0.1;
+  const color = isFlat ? 'var(--ochre)' : (isDown ? 'var(--moss)' : 'var(--danger)');
+  const bg = isFlat ? 'var(--ochre-dim)' : (isDown ? 'var(--moss-dim)' : 'var(--danger-dim)');
+  const msg = isFlat
+    ? 'Sin cambio significativo en tus últimos registros. Si pasan 2 semanas así, ajustamos el déficit.'
+    : (isDown ? `Tendencia a la baja: ${diff} kg en tus últimos registros. Vas bien.` : `Tendencia al alza: +${Math.abs(diff)} kg. Revisa si el déficit se está cumpliendo.`);
+  trendEl.innerHTML = `<div class="weigh-trend" style="background:${bg}; color:${color};">${msg}</div>`;
+}
+
 // ═══════════════ NAV ═══════════════
 
 document.querySelectorAll('.nav-btn').forEach(btn => {
@@ -683,6 +1001,8 @@ renderFullbody();
 renderExcluded();
 renderAdvice();
 renderWeekSummary();
+renderHistory();
+renderWeighIns();
 </script>
 
 </body>
